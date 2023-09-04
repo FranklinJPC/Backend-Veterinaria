@@ -1,0 +1,571 @@
+openapi: 3.0.0
+info:
+  title: DOGY-CARE API
+  description: Documentación de la API para gestionar veterinarios y pacientes.
+  version: 1.0.0
+servers:
+  - url: https://veteriana-epn.onrender.com
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+paths:
+  /login:
+    post:
+      summary: OKIniciar sesión como veterinario.
+      description: Una vez realizado el proceso de registro en la página web, el usuario puede realizar el inicio de sesión, siempre y cuando se haya verificado la cuenta.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+                  email: "hola@gmail.com"
+                  password: "contra123"
+      responses:
+        '200':
+          description: Inicio de sesión exitoso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  token:
+                    type: string
+                  nombre:
+                    type: string
+                  apellido:
+                    type: string
+                  direccion:
+                    type: string
+                  telefono:
+                    type: number
+                  _id:
+                    type: string
+                  email:
+                    type: string
+              example:
+                  token: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY0ZjUzYTAxZTA1ZmU2MDM0YjdmZGI4ZCIsImlhdCI6MTY5Mzc5NDQwMSwiZXhwIjoxNjkzODgwODAxfQ.AkuYBB0IpDQ1aE6ShsWOM-e2KiLi5H3rXSxWwDsudB0"
+                  nombre: "dex"
+                  apellido: "dextron"
+                  direccion: "Quito, 10 de agosto SN"
+                  telefono: 1029384756
+                  _id: "74f95b01e05fe8834b7fdb8d"
+                  email: "hola@gmail.com"
+        '403':
+          description: Cuenta no verificada.
+        '404':
+          description: Usuario no encontrado o contraseña incorrecta.
+  /perfil:
+    get:
+      summary: Obtener perfil de veterinario.
+      description: Obtiene el perfil del veterinario autenticado.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Perfil obtenido correctamente.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  nombre:
+                    type: string
+                  apellido:
+                    type: string
+                  direccion:
+                    type: string
+                  telefono:
+                    type: number
+                  _id:
+                    type: string
+                  email:
+                    type: string
+              example:
+                nombre: "elvis"
+                apellido: "elvis"
+                direccion: "elvis"
+                telefono: 1234567890
+                email: "elvis_27071999@hotmail.com"
+                password: "123epn"
+  /registro:
+    post:
+      summary: OKRegistro de veterinario
+      description: Registro de un nuevo veterinario.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                direccion:
+                  type: string
+                telefono:
+                  type: number
+                email:
+                  type: string
+                password:
+                  type: string
+            example:
+              nombre: "elvis"
+              apellido: "elvis"
+              direccion: "elvis"
+              telefono: 1234567890
+              email: "usuario@epn.edu.ec"
+              password: "123epn"  
+      responses:
+        '200':
+          description: Registro exitoso. Verifica tu correo electrónico.
+  /confirmar/{token}:
+    get:
+      summary: OKConfirmar correo electrónico de veterinario.
+      description: Confirma la cuenta de un veterinario utilizando un token.
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+          example: "lr4vr4n367r"
+      responses:
+        '200':
+          description: Cuenta confirmada. Puedes iniciar sesión.
+        '404':
+          description: Token no válido o cuenta ya confirmada.
+  /recuperar-password:
+    post:
+      summary: OKRecuperar contraseña
+      description: Envía un correo electrónico para recuperar la contraseña.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+            example:
+              email: "hola@hotmail.com"
+      responses:
+        '200':
+          description: Revisa tu correo electrónico para reestablecer tu cuenta.
+        '404':
+          description: Usuario no encontrado.
+  /recuperar-password/{token}:
+    get:
+      summary: OKComprobar token de recuperación
+      description: Comprueba la validez del token de recuperación.
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+          example: "ekjmrdsmol7"
+      responses:
+        '200':
+          description: Token confirmado, ya puedes crear tu nuevo password.
+        '404':
+          description: Token no válido.
+  /nuevo-password/{token}:
+    post:
+      summary: OKCrear nueva contraseña
+      description: Crea una nueva contraseña utilizando un token de recuperación.
+      parameters:
+        - in: path
+          name: token
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                password:
+                  type: string
+                confirmpassword:
+                  type: string
+            example:
+              password: "propro"
+              confirmpassword: "propro"
+      responses:
+        '200':
+          description: Felicitaciones, ya puedes iniciar sesión con tu nuevo password.
+        '404':
+          description: Token no válido o las contraseñas no coinciden.
+  /veterinarios:
+    get:
+      summary: OKListar veterinarios
+      description: Obtiene una lista de todos los veterinarios registrados.
+      responses:
+        '200':
+          description: Lista de veterinarios registrados.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  res:
+                    type: string
+              example:
+                res: "Lista de veterinarios registrados."
+  /veterinario/{id}:
+    get:
+      summary: Detalle de veterinario
+      description: Obtiene los detalles de un veterinario por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "64f53a01e05fe6034b7fdb8d"
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detalle del veterinario.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  msg:
+                    type: object
+                    properties:
+                      _id:
+                        type: string
+                      nombre:
+                        type: string
+                      apellido:
+                        type: string
+                      direccion:
+                        type: string
+                      telefono:
+                        type: number
+                      email:
+                        type: string
+                      status:
+                        type: boolean
+                      token:
+                        type: string
+                      confirmEmail:
+                        type: boolean
+                      createdAt:
+                        type: string
+                        format: date-time
+                      updatedAt:
+                        type: string
+                        format: date-time
+                      __v:
+                        type: integer
+              example:
+                msg:
+                  _id: "64f53a01e05fe6034b7fdb8d"
+                  nombre: "dex"
+                  apellido: "dex"
+                  direccion: "dex"
+                  telefono: 1029384756
+                  email: "hola@gmail.com"
+                  status: true
+                  token: null
+                  confirmEmail: true
+                  createdAt: "2023-09-04T02:00:03.227Z"
+                  updatedAt: "2023-09-04T13:41:36.208Z"
+                  __v: 0
+    put:
+      summary: Actualizar perfil de veterinario
+      description: Actualiza el perfil de un veterinario por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "64f53a01e05fe6034b7fdb8d"
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                apellido:
+                  type: string
+                direccion:
+                  type: string
+                telefono:
+                  type: number
+                email:
+                  type: string
+            example:
+              nombre: elvis
+              apellido: elvis
+              direccion: elvis
+              telefono: 987654321
+              email: elviserock@gmail.com
+      responses:
+        '200':
+          description: Perfil actualizado correctamente.
+  /veterinario/actualizarpassword:
+    put:
+      summary: OKActualizar contraseña
+      description: Actualiza la contraseña del veterinario autenticado.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                passwordactual:
+                  type: string
+                passwordnuevo:
+                  type: string
+            example:
+              passwordactual: "propro"
+              passwordnuevo: "123abc"
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Contraseña actualizada correctamente.
+        '404':
+          description: Lo sentimos, el password actual no es el correcto.
+  /pacientes:
+    get:
+      summary: OKListar pacientes
+      description: Obtiene una lista de pacientes registrados por el veterinario autenticado.
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Lista de pacientes registrados.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
+                    propietario:
+                      type: string
+                    email:
+                      type: string
+                    celular:
+                      type: string
+                    convencional:
+                      type: string
+                    ingreso:
+                      type: string
+                    sintomas:
+                      type: string
+                    estado:
+                      type: boolean
+                    id:
+                      type: string
+              example:
+                - _id: "64f5fd42ff6712a56f4feaa8"
+                  nombre: "dex"
+                  propietario: "dex"
+                  email: "dex@gmail.com"
+                  celular: "3423423"
+                  convencional: "324234"
+                  ingreso: "2023-09-04T15:52:02.663Z"
+                  sintomas: "dolor"
+                  estado: true
+                  veterinario:
+                    _id: "64f53a01e05fe6034b7fdb8d"
+                    nombre: "elvis"
+                    apellido: "elvis"
+                - _id: "64f5ffd9c844e318bcd44c93"
+                  nombre: "pro"
+                  propietario: "pro"
+                  email: "pro@gmail.com"
+                  celular: "456"
+                  convencional: "456"
+                  ingreso: "2023-09-04T16:01:49.824Z"
+                  sintomas: "dolor"
+                  estado: true
+                  veterinario:
+                    _id: "64f53a01e05fe6034b7fdb8d"
+                    nombre: "elvis"
+                    apellido: "elvis"
+  /paciente/{id}:
+    get:
+      summary: Detalle de paciente
+      description: Obtiene los detalles de un paciente por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "64f5fd42ff6712a56f4feaa8"
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detalle del paciente.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    nombre:
+                      type: string
+                    propietario:
+                      type: string
+                    email:
+                      type: string
+                    celular:
+                      type: string
+                    convencional:
+                      type: string
+                    ingreso:
+                      type: string
+                    sintomas:
+                      type: string
+                    estado:
+                      type: boolean
+                    id:
+                      type: string
+              example:
+                _id: "64f5fd42ff6712a56f4feaa8"
+                nombre: "dex"
+                propietario: "dex"
+                email: "dex@gmail.com"
+                celular: "3423423"
+                convencional: "324234"
+                ingreso: "2023-09-04T15:52:02.663Z"
+                sintomas: "dolor"
+                estado: true
+                veterinario:
+                  _id: "64f53a01e05fe6034b7fdb8d"
+                  nombre: "elvis"
+                  apellido: "elvis"
+  /paciente/registro:
+    post:
+      summary: Registrar paciente
+      description: Registra un nuevo paciente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                propietario:
+                  type: string
+                email:
+                  type: string
+                celular:
+                  type: string
+                convencional:
+                  type: string
+                ingreso:
+                  type: string
+                sintomas:
+                  type: string
+            example:
+              nombre: spike
+              propietario: frank
+              email: frank@gmail.com
+              celular: 917583652
+              convencional: 22889563
+              ingreso: 2023-09-04
+              sintomas: Dolor pata izquierda
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Registro exitoso del paciente.
+  /paciente/actualizar/{id}:
+    put:
+      summary: Actualizar paciente
+      description: Actualiza los detalles de un paciente por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "64f5fd42ff6712a56f4feaa8"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nombre:
+                  type: string
+                propietario:
+                  type: string
+                email:
+                  type: string
+                celular:
+                  type: string
+                convencional:
+                  type: string
+                ingreso:
+                  type: string
+                sintomas:
+                  type: string
+            example:
+              nombre: pro1
+              propietario: pro1
+              email: pro1@gmail.com
+              celular: "39456348"
+              convencional: "784574234"
+              ingreso: 2023-09-04
+              sintomas: fiebre
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Actualización exitosa del paciente.
+  /paciente/eliminar/{id}:
+    delete:
+      summary: Eliminar paciente
+      description: Elimina un paciente por su ID.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: string
+          example: "64f6024a84ee4ab4baa51764"
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Fecha de salida del paciente registrada exitosamente.
