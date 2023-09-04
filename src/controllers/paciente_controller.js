@@ -18,8 +18,8 @@ const detallePaciente = async(req,res)=>{
 const registrarPaciente = async(req,res)=>{
     try{
         if (Object.values(req.body).includes("")) return res.status(400).json({msg:"Lo sentimos, debes llenar todos los campos"})
-        const {nombre, propietario, email, celular, convencional, ingreso, sintomas, veterinario} = req.body
-        const nuevoPaciente = new Paciente({nombre, propietario, email, celular, convencional, ingreso, sintomas, veterinario})
+        const {nombre, propietario, email, celular, convencional, ingreso, salida, sintomas, veterinario} = req.body
+        const nuevoPaciente = new Paciente({nombre, propietario, email, celular, convencional, ingreso, salida, sintomas, veterinario})
         nuevoPaciente.veterinario=req.body.id
         //console.log(req.body)
         await nuevoPaciente.save()
